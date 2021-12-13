@@ -10,10 +10,12 @@ public class ScorePanel extends JPanel {
 	static public boolean ending = false;
 	static public int score = 0;
 	
-	private int time = 61;
+	private int time = 60;
+	
 	private JLabel textLabel = new JLabel("시간");
 	private JLabel timeLabel = new JLabel(Integer.toString(time));
-	private TimeThread timeThread;
+	
+	private TimeThread timeThread = null;
 	
 	public ScorePanel() {		
 		
@@ -44,9 +46,12 @@ public class ScorePanel extends JPanel {
 	}
 	
 	public void timeSet() {
-		timeThread.interrupt();
-		time = 61;
-		score = 0;
+		if(timeThread != null) {
+			timeThread.interrupt();
+			timeThread = null;
+			time = 61;
+			score = 0;
+		}
 	}
 	
 	class TimeThread extends Thread {
@@ -81,6 +86,7 @@ public class ScorePanel extends JPanel {
 						time = 0;
 						timeLabel.setText(Integer.toString(time));
 						ending = true;
+						timeThread = null;
 						break;
 					}
 				} catch (InterruptedException e) {
@@ -89,6 +95,7 @@ public class ScorePanel extends JPanel {
 						time = 0;
 						timeLabel.setText(Integer.toString(time));
 						ending = true;
+						timeThread = null;
 						break;
 					}
 					return;

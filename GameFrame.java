@@ -14,16 +14,17 @@ import javax.swing.JMenuItem;
 import javax.swing.JToolBar;
 
 public class GameFrame extends JFrame {
-	private ImageIcon startNormalIcon = new ImageIcon("startNormal.gif");
-	private ImageIcon startPressedIcon = new ImageIcon("startPressed.gif");
-	private ImageIcon startOverIcon = new ImageIcon("startOver.gif");
-	private ImageIcon stopNormalIcon = new ImageIcon("stopNormal.gif");
-	private ImageIcon stopPressedIcon = new ImageIcon("stopPressed.gif");
-	private ImageIcon stopOverIcon = new ImageIcon("stopOver.gif");
+	private ImageIcon startNormalIcon = new ImageIcon("startBtn.gif");
+	private ImageIcon startPressedIcon = new ImageIcon("startPressedBtn.gif");
+	private ImageIcon startOverIcon = new ImageIcon("startOverBtn.gif");
+	private ImageIcon stopNormalIcon = new ImageIcon("resetBtn.gif");
+	private ImageIcon stopPressedIcon = new ImageIcon("resetPressedBtn.gif");
+	private ImageIcon stopOverIcon = new ImageIcon("resetOverBtn.gif");
 
 	private JMenuItem startMenuItem = new JMenuItem("start");
-	private JMenuItem stopMenuItem = new JMenuItem("stop");
+	private JMenuItem resetMenuItem = new JMenuItem("reset");
 	private JMenuItem exitMenuItem = new JMenuItem("exit");
+	private JMenuItem rankMenuItem = new JMenuItem("rank");
 
 	private JButton startBtn = new JButton(startNormalIcon);
 	private JButton resetBtn = new JButton(stopNormalIcon);
@@ -32,8 +33,6 @@ public class GameFrame extends JFrame {
 	private EditPanel ePanel = new EditPanel();
 	private GamePanel gPanel = new GamePanel();
 	
-	private boolean startBtnClicked = false;
-		
 	public GameFrame() {
 		setTitle("타이핑 게임");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -69,15 +68,21 @@ public class GameFrame extends JFrame {
 		setJMenuBar(mBar);
 		
 		JMenu fileMenu = new JMenu("GAME");
+		JMenu rankMenu = new JMenu("RANK");
 		
 		fileMenu.add(startMenuItem);
-		fileMenu.add(stopMenuItem);
+		fileMenu.add(resetMenuItem);
 		fileMenu.addSeparator();
 		fileMenu.add(exitMenuItem);
 		
+		rankMenu.add(rankMenuItem);
+		
 		mBar.add(fileMenu);
+		mBar.add(rankMenu);
 		
 		startMenuItem.addActionListener(new StartAction());
+		resetMenuItem.addActionListener(new ResetAction());
+		rankMenuItem.addActionListener(new RankAction());
 	}
 	
 	private void makeToolBar() {
@@ -96,6 +101,8 @@ public class GameFrame extends JFrame {
 	}
 	
 	private class StartAction implements ActionListener {
+		
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			gPanel.ggp.gameStart();
 			sPanel.timeStart();
@@ -106,12 +113,28 @@ public class GameFrame extends JFrame {
 	}
 	
 	private class ResetAction implements ActionListener {
+		
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			gPanel.ggp.gameSet();
 			sPanel.timeSet();
 			
 			startBtn.setEnabled(true);
 			resetBtn.setEnabled(false);
+		}
+	}
+	
+	private class RankAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			gPanel.ggp.gameSet();
+			sPanel.timeSet();
+			gPanel.changePanel();
+			startBtn.setEnabled(true);
+			resetBtn.setEnabled(false);
+			revalidate();
+			repaint();
 		}
 	}
 }

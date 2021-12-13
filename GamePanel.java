@@ -3,21 +3,36 @@ package miniProject;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Color;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Scanner;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class GamePanel extends JPanel {
+	private int panelChange = 0;
+	
 	private JTextField input = new JTextField(20);
-	private JLabel explain = new JLabel("단어를 빠르게 타이핑 하시오");
+	
+	private JLabel explain;
+	
 	private Word[] words = new Word[3];
 	private Word superWord1;
 	private Word superWord2;
+	
 	private TextSource textSource = new TextSource();
-		
+	
+	private RankPanel rp;
 	public GameGroundPanel ggp = new GameGroundPanel();
 	
 	static public boolean timePlus = false;
@@ -27,7 +42,7 @@ public class GamePanel extends JPanel {
 		setLayout(new BorderLayout());
 		add(ggp, BorderLayout.CENTER);
 		add(new InputPanel(), BorderLayout.SOUTH);
-		
+				
 		input.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JTextField t = (JTextField)e.getSource();
@@ -77,22 +92,48 @@ public class GamePanel extends JPanel {
 		});
 	}
 	
+	public void changePanel() {
+		if(panelChange == 0) {
+			panelChange = 1;
+			this.removeAll();
+			rp = new RankPanel();
+			add(rp, BorderLayout.CENTER);
+			revalidate();
+			repaint();
+		}
+		else {
+			panelChange = 0;
+			this.removeAll();
+			ggp = new GameGroundPanel();
+			add(ggp, BorderLayout.CENTER);
+			add(new InputPanel(), BorderLayout.SOUTH);
+			revalidate();
+			repaint();
+		}
+	}
+	
 	
 	class GameGroundPanel extends JPanel {
 		
-		private GameThread gameThread;
+		private ImageIcon icon = new ImageIcon("gameback.png");
+		private Image img = icon.getImage();
+		
+		private GameThread gameThread = null;
 
 		public GameGroundPanel() {
 			setLayout(null);
 			setBackground(Color.white);
 			
-			explain.setSize(450, 40);
+			explain = new JLabel("단어를 빠르게 타이핑 하시오");
+			
+			explain.setSize(520, 40);
 			explain.setHorizontalAlignment(JLabel.CENTER);
 			explain.setFont(new Font("돋움체", Font.BOLD, 20));
-			explain.setLocation(50, 250);
+			explain.setLocation(0, 250);
 			add(explain);
 		}
 		
+		// 게임 시작, 변수들 초기화
 		public void gameStart() {
 			setBackground(Color.WHITE);
 			explain.setVisible(false);
@@ -106,8 +147,35 @@ public class GamePanel extends JPanel {
 			gameThread.start();
 		}
 		
+		// 게임 종료
 		public void gameSet() {
-			gameThread.interrupt();
+			if(gameThread != null) {
+				gameThread.interrupt();
+				gameThread = null;
+				for(int i=0;i<3;i++) {
+					words[i].la.setVisible(false);
+					words[i].la = new JLabel(textSource.get());
+					words[i].delete = -1;
+				}
+				superWord1.la.setVisible(false);
+				superWord1.la = new JLabel(textSource.get());
+				superWord1.delete = -1;
+				
+				superWord2.la.setVisible(false);
+				superWord2.la = new JLabel(textSource.get());
+				superWord2.delete = -1;
+				
+				GameGroundPanel.this.setBackground(Color.BLACK);
+				explain.setForeground(Color.YELLOW);
+				explain.setText("게임이 리셋되었습니다. 다시 시작해주세요.");
+				explain.setVisible(true);				
+			}
+		}
+		
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			
+			g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), null);
 		}
 		
 		class GameThread extends Thread {
@@ -198,30 +266,128 @@ public class GamePanel extends JPanel {
 							break;
 						}
 					} catch (InterruptedException e) {
-						for(int i=0;i<3;i++) {
-							words[i].la.setVisible(false);
-							words[i].la = new JLabel(textSource.get());
-							words[i].delete = -1;
-						}
-						superWord1.la.setVisible(false);
-						superWord1.la = new JLabel(textSource.get());
-						superWord1.delete = -1;
-						
-						superWord2.la.setVisible(false);
-						superWord2.la = new JLabel(textSource.get());
-						superWord2.delete = -1;
-						
-						GameGroundPanel.this.setBackground(Color.BLACK);
-						explain.setForeground(Color.YELLOW);
-						explain.setText("게임을 리셋시켰습니다. 다시 시작해주세요.");
-						explain.setVisible(true);							
-						
 						return;
 					}
 				}
 			}
+		}
 	}
+	
+	class RankPanel extends JPanel {
+		private ImageIcon icon = new ImageIcon("lankback.png");
+		private Image img = icon.getImage();
 		
+		private int[] list;
+		private int temp;
+		private HashMap<Integer, String> h = new HashMap<Integer, String>();
+		
+		private ImageIcon closeIcon = new ImageIcon("closeBtn.gif");
+		private ImageIcon closePressedIcon = new ImageIcon("closePressedBtn.gif");
+		private ImageIcon closeOverIcon = new ImageIcon("closeOverBtn.gif");
+		private JButton closeBtn = new JButton(closeIcon);
+		
+		private JLabel[] la = new JLabel[10];
+		
+		private Font f = new Font("고딕체", Font.BOLD, 20);		
+
+		public RankPanel(){
+			Scanner s;
+			
+			setBackground(Color.CYAN);
+						
+			try {
+				s = new Scanner(new File("rank.txt"));
+				while(s.hasNextLine()) {
+					String str =s.nextLine();
+					h.put(Integer.parseInt(str.split(" ")[1]),str.split(" ")[0]);
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			list = new int[h.size()];
+			
+			int k=0;
+			for(Integer key : h.keySet()) {
+					list[k++] = key;
+				}
+			sort(list.length);
+			
+			setLayout(null);
+			
+			la[0] = new JLabel(list[0] + "  " + h.get(list[0]));
+			la[0].setForeground(new Color(218,166,0));
+			la[0].setFont(f);
+			la[0].setBounds(215, 125, 200, 20);
+			add(la[0]);
+			
+			la[1] = new JLabel(list[1] + "  " + h.get(list[1]));
+			la[1].setForeground(new Color(110,110,110));
+			la[1].setFont(f);
+			la[1].setBounds(53, 138, 200, 20);
+			add(la[1]);
+			
+			la[2] = new JLabel(list[2] + "  " + h.get(list[2]));
+			la[2].setForeground(new Color(215,98,19));
+			la[2].setFont(f);
+			la[2].setBounds(384, 153, 200, 20);
+			add(la[2]);
+			
+			if(list.length < 10) {
+				for(int i=3;i<list.length;i++) {
+					la[i] = new JLabel((i + 1) + "등  :  " + list[i] + "   " + h.get(list[i]));
+					la[i].setForeground(Color.BLACK);
+					la[i].setFont(new Font("고딕체", Font.PLAIN, 15));
+					la[i].setBounds(45, 150 + (i*30), 400, 20);
+					add(la[i]);
+				}
+			}
+			else {
+				for(int i=3;i<9;i++) {
+					la[i] = new JLabel((i + 1) + "등  :  " + list[i] + "   " + h.get(list[i]));
+					la[i].setForeground(Color.BLACK);
+					la[i].setFont(new Font("고딕체", Font.PLAIN, 15));
+					la[i].setBounds(213, 150 + (i*30), 400, 20);
+					add(la[i]);
+				}
+				la[9] = new JLabel((9 + 1) + "등  :  " + list[9] + "   " + h.get(list[9]));
+				la[9].setForeground(Color.BLACK);
+				la[9].setFont(new Font("고딕체", Font.PLAIN, 15));
+				la[9].setBounds(205, 420, 400, 20);
+				add(la[9]);
+			}
+			
+			closeBtn.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					changePanel();
+				}		
+			});
+			
+			closeBtn.setSize(38, 24);
+			closeBtn.setLocation(460, 20);
+			closeBtn.setPressedIcon(closePressedIcon);
+			closeBtn.setRolloverIcon(closeOverIcon);
+			add(closeBtn);
+		}
+		
+		private void sort(int n) {			
+			for(int i=n-1;i>0;i--)
+				for(int j=0;j<i;j++) {
+					if(list[j]<list[j+1])
+							swap(j, j+1);
+				}
+		}
+		
+		private void swap(int x, int y) {
+			temp=list[x];list[x]=list[y];list[y]=temp;
+		}
+		
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			
+			g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), null);
+		}
 	}
 	
 	class InputPanel extends JPanel {
