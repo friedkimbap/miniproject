@@ -2,11 +2,12 @@ package miniProject;
 
 import java.awt.*;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.*;
 
 public class ScorePanel extends JPanel {
+	private ImageIcon icon = new ImageIcon("scoreback.png");
+	private Image img = icon.getImage();
+	
 	static public boolean ending = false;
 	static public int score = 0;
 	
@@ -14,27 +15,41 @@ public class ScorePanel extends JPanel {
 	
 	private JLabel textLabel = new JLabel("시간");
 	private JLabel timeLabel = new JLabel(Integer.toString(time));
+	private JLabel textLabel2 = new JLabel("점수");
+	private JLabel scoreLabel = new JLabel(Integer.toString(score));
 	
 	private TimeThread timeThread = null;
 	
 	public ScorePanel() {		
 		
-		this.setBackground(Color.gray);
+		this.setBackground(new Color(172,187,21));
 		setLayout(null);
 		
-		Font font = new Font("Godic", Font.BOLD, 20);
+		Font font = new Font("맑은 고딕", Font.BOLD, 25);
 		
 		textLabel.setFont(font);
-		textLabel.setForeground(Color.cyan);
-		textLabel.setSize(50,20);
+		textLabel.setForeground(new Color(237,124,47));
+		textLabel.setSize(60,40);
 		textLabel.setLocation(50,30);
 		add(textLabel);
 		
 		timeLabel.setFont(font);
-		timeLabel.setForeground(Color.yellow);
-		timeLabel.setSize(100,20);
+		timeLabel.setForeground(Color.BLACK);
+		timeLabel.setSize(100,40);
 		timeLabel.setLocation(160,30);
 		add(timeLabel);
+		
+		textLabel2.setFont(font);
+		textLabel2.setForeground(new Color(237,124,47));
+		textLabel2.setSize(60,40);
+		textLabel2.setLocation(50,90);
+		add(textLabel2);
+		
+		scoreLabel.setFont(font);
+		scoreLabel.setForeground(Color.BLACK);
+		scoreLabel.setSize(100,40);
+		scoreLabel.setLocation(160,90);
+		add(scoreLabel);
 	}
 	
 	public void timeStart() {
@@ -54,6 +69,12 @@ public class ScorePanel extends JPanel {
 		}
 	}
 	
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		
+		g.drawImage(img, 0, 0, getWidth(), getHeight(), null);
+	}
+	
 	class TimeThread extends Thread {
 		private int time;
 		private JLabel timeLabel = null;
@@ -67,6 +88,7 @@ public class ScorePanel extends JPanel {
 			while(time > 0) {
 				time--;
 				timeLabel.setText(Integer.toString(time));
+				scoreLabel.setText(Integer.toString(score));
 				
 				if(GamePanel.timePlus == true) {
 					time+=15;
@@ -80,11 +102,11 @@ public class ScorePanel extends JPanel {
 				
 				try {
 					Thread.sleep(1000);
-					score++;
 					if(time <= 0) {
 						System.out.println(score);
 						time = 0;
 						timeLabel.setText(Integer.toString(time));
+						scoreLabel.setText(Integer.toString(score));
 						ending = true;
 						timeThread = null;
 						break;
@@ -94,6 +116,7 @@ public class ScorePanel extends JPanel {
 						System.out.println(score);
 						time = 0;
 						timeLabel.setText(Integer.toString(time));
+						scoreLabel.setText(Integer.toString(score));
 						ending = true;
 						timeThread = null;
 						break;

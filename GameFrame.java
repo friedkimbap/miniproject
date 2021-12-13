@@ -32,9 +32,9 @@ public class GameFrame extends JFrame {
 	private ScorePanel sPanel = new ScorePanel();
 	private EditPanel ePanel = new EditPanel();
 	private GamePanel gPanel = new GamePanel();
-	
+		
 	public GameFrame() {
-		setTitle("타이핑 게임");
+		setTitle("우당탕탕~ 왁자지껄~ 두더지 대소동!!");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(800,600);
 		setResizable(false);

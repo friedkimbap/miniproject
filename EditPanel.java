@@ -2,6 +2,7 @@ package miniProject;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,8 +17,8 @@ import javax.swing.JLabel;
 public class EditPanel extends JPanel {
 	private JTextField edit = new JTextField(20);
 	
-	private JButton addButton = new JButton("add");
-	private JButton saveButton = new JButton("save");
+	private JButton addButton = new JButton("단어 추가");
+	private JButton saveButton = new JButton("점수 기록");
 	
 	private JLabel editLabel = new JLabel("");
 	
@@ -30,6 +31,7 @@ public class EditPanel extends JPanel {
 		add(saveButton);
 		add(editLabel);
 		
+		editLabel.setFont(new Font("맑은 고딕", Font.BOLD, 15));
 		editLabel.setForeground(Color.yellow);
 		
 		addButton.addActionListener(new AddAction());
