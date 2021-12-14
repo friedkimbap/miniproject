@@ -1,14 +1,13 @@
 package miniProject;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Color;
-import java.awt.event.*;
-import java.awt.image.ImageObserver;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -23,36 +22,43 @@ import javax.swing.JTextField;
 public class GamePanel extends JPanel {
 	private int panelChange = 0;
 	
+	// 단어를 입력할 입력창
 	private JTextField input = new JTextField(20);
 	
+	// 시작하기 전에 설명해주는 텍스트
 	private JLabel explain;
 	
+	// 두더지의 이미지를 가지고 있는 JLabel
 	private ImageIcon mIcon = new ImageIcon("mole.png");
 	private Image mImg = mIcon.getImage();
 	private JLabel[] moleImage = new JLabel[3];
 	
+	// 두더지 퇴치기의 이미지를 가지고 있는 JLabel
 	private ImageIcon kIcon = new ImageIcon("killMole.png");
 	private Image kImg = kIcon.getImage();
 	private JLabel kMoleImage = new JLabel();
 	
+	// 시계의 이미지를 가지고 있는 JLabel
 	private ImageIcon cIcon = new ImageIcon("clock.png");
 	private Image cImg = cIcon.getImage();
 	private JLabel clockImage = new JLabel();
 	
-	
+	// 맞춰야할 단어를 가르키는 Word 객체
 	private Word[] words = new Word[3];
 	private Word superWord1;
 	private Word superWord2;
 	
+	// 단어를 불러오기 위한 객체
 	private TextSource textSource = new TextSource();
 	
+	// 각각 랭크를 보여주는 패널, 게임 화면을 보여주는 패널
 	private RankPanel rp;
 	public GameGroundPanel ggp = new GameGroundPanel();
 	
 	static public boolean timePlus = false;
 	static public int timeMinus = 0;
 	
-	public GamePanel() {	
+	public GamePanel() {
 		setLayout(new BorderLayout());
 		add(ggp, BorderLayout.CENTER);
 		add(new InputPanel(), BorderLayout.SOUTH);
@@ -63,8 +69,8 @@ public class GamePanel extends JPanel {
 				String inWord = t.getText();
 				
 				// 단어 맞출 경우 단어 삭제
-				if(inWord.equals(words[2].la.getText()) && words[2].delete != 1) {
-					ScorePanel.score++;
+				if(inWord.equals(words[2].la.getText()) && words[2].delete != 1) {				
+					ScorePanel.score += inWord.length();
 
 					words[2].la.setVisible(false);
 					words[2].la = new JLabel(textSource.get());
@@ -72,7 +78,7 @@ public class GamePanel extends JPanel {
 					moleImage[2].setVisible(false);
 				}
 				else if(inWord.equals(words[1].la.getText()) && words[1].delete != 1){
-					ScorePanel.score++;
+					ScorePanel.score += inWord.length();
 
 					words[1].la.setVisible(false);
 					words[1].la = new JLabel(textSource.get());
@@ -80,7 +86,7 @@ public class GamePanel extends JPanel {
 					moleImage[1].setVisible(false);
 				}
 				else if(inWord.equals(words[0].la.getText()) && words[0].delete != 1) {
-					ScorePanel.score++;
+					ScorePanel.score += inWord.length();
 					
 					words[0].la.setVisible(false);
 					words[0].la = new JLabel(textSource.get());
@@ -96,7 +102,7 @@ public class GamePanel extends JPanel {
 					// 단어를 모두 없애줌
 					for(int i=0;i<3;i++) {
 						if(words[i].delete != 1) {
-							ScorePanel.score++;
+							ScorePanel.score += words[i].la.getText().length();
 						}
 						
 						words[i].la.setVisible(false);
@@ -294,7 +300,6 @@ public class GamePanel extends JPanel {
 							superWord1.la.setForeground(Color.BLACK);
 							superWord1.la.setHorizontalAlignment(JLabel.CENTER);
 							superWord1.la.setLocation(15+(int)(Math.random()*(getWidth()-131)),15+(int)(Math.random()*(getHeight()-160)));
-							System.out.println(getWidth() +","+ getHeight());
 							add(superWord1.la);
 							
 							kMoleImage.setVisible(true);
@@ -369,7 +374,7 @@ public class GamePanel extends JPanel {
 	}
 	
 	class RankPanel extends JPanel {
-		private ImageIcon icon = new ImageIcon("lankback.png");
+		private ImageIcon icon = new ImageIcon("rankback.png");
 		private Image img = icon.getImage();
 		
 		private int[] list;
@@ -410,21 +415,24 @@ public class GamePanel extends JPanel {
 			setLayout(null);
 			
 			la[0] = new JLabel(list[0] + "  " + h.get(list[0]));
+			la[0].setHorizontalAlignment(JLabel.CENTER);
 			la[0].setForeground(new Color(218,166,0));
 			la[0].setFont(f);
-			la[0].setBounds(215, 125, 200, 20);
+			la[0].setBounds(168, 125, 200, 20);
 			add(la[0]);
 			
 			la[1] = new JLabel(list[1] + "  " + h.get(list[1]));
+			la[1].setHorizontalAlignment(JLabel.CENTER);
 			la[1].setForeground(new Color(110,110,110));
 			la[1].setFont(f);
-			la[1].setBounds(53, 138, 200, 20);
+			la[1].setBounds(-2, 138, 200, 20);
 			add(la[1]);
 			
 			la[2] = new JLabel(list[2] + "  " + h.get(list[2]));
+			la[2].setHorizontalAlignment(JLabel.CENTER);
 			la[2].setForeground(new Color(215,98,19));
 			la[2].setFont(f);
-			la[2].setBounds(384, 151, 200, 20);
+			la[2].setBounds(340, 151, 200, 20);
 			add(la[2]);
 			
 			if(list.length < 10) {

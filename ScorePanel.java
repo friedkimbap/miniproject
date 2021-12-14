@@ -64,7 +64,8 @@ public class ScorePanel extends JPanel {
 		if(timeThread != null) {
 			timeThread.interrupt();
 			timeThread = null;
-			time = 61;
+			time = 60;
+			timeLabel.setText(Integer.toString(time));
 			score = 0;
 		}
 	}
@@ -103,7 +104,6 @@ public class ScorePanel extends JPanel {
 				try {
 					Thread.sleep(1000);
 					if(time <= 0) {
-						System.out.println(score);
 						time = 0;
 						timeLabel.setText(Integer.toString(time));
 						scoreLabel.setText(Integer.toString(score));
